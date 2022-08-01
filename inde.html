@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<script src="./gif.js"></script>
+	<title>视频转Gif</title>
+</head>
+<body>
+	<button type="button" id="btn">开始</button>
+	<video id="video" controls src="./catmovie.mp4" width="500" height="380"/>
+	<script type="text/javascript">
+		var video;
+		var canvas;
+		var igs_src;
+		var imglist = []
+		var gif = new GIF({
+		    workers: 2,
+		    quality: 10
+		});
+		btn.onclick = gifs
+		function gifs() {
+			var timer = setInterval(function () {
+			    video = document.getElementById("video");	//获取页面中的video元素
+			    canvas = document.createElement("canvas"); // 创建一个画布
+			    canvas.width = video.videoWidth * 0.2;
+			    canvas.height = video.videoHeight * 0.2;
+			    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // getContext:设置画布环境；drawImage:画画
+			    var imgurl = canvas.toDataURL("image/png");
+			    igs_src = imgurl; // 获取图片的url
+			    imglist.push(imgurl);	//将每张图片的添加到vue对象imglist中
+				console.log(imglist)
+				console.log(video)
+				video.play()
+			    if(imglist.length>10){
+					// 添加显示
+					for(let _x = 0; _x<imglist.length;_x++) {
+						let _img = document.createElement("img")
+						_img.src= imglist[_x]
+						_img.class = 'images'
+						document.querySelector('body').appendChild(_img)
+						
+					}
+			        clearInterval(timer);
+			        setTimeout(function () {
+						var _image = document.querySelectorAll('img')
+			            for(var i=0;i<_image.length;i++){
+			                gif.addFrame(_image[i], {delay: 1000});						
+							console.log(_image[i])
+							gif.addFrame(canvas,{copy:true})
+			            }
+			            gif.on('finished', function(blob) {
+			                console.log(blob);
+							donw(blob)
+							video.pause()
+			                // window.open(URL.createObjectURL(blob));
+			            });
+			            gif.render();
+			        },200)
+			    }
+			},500)
+		}
+		
+		function donw(blob) {
+			const link = document.createElement('a')
+			// 规定下载的超链接
+			link.download = +new Date() + 'gif'
+			// 未点击前隐藏a链接
+			link.style.display = 'none'
+			// 创建URL对象，指向该文件url
+			link.href = URL.createObjectURL(blob)
+			// 将a标签添加到dom中
+			document.body.append(link)
+			// 触发a标签点击事件
+			link.click()
+			// 释放之前的URL对象
+			URL.revokeObjectURL(link.href)
+			// 从dom中移除该a链接
+			document.body.removeChild(link)
+		}
+	</script>
+</body>
+</html>
