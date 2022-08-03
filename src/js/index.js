@@ -1,12 +1,20 @@
 var flag = false;
 var flag_loading = false;
+var video;
+var canvas;
+// 分辨率
+var resolut = [null, null]
+// 动画速度
+var speed = 150
+// 画质
+var quality = 20
+// 流畅度
+var smooth = 200
 window.onload = ()=> {
-	var video;
-	var canvas;
 	var imglist = [];
 	var gif = new GIF({
 		workers: 2,
-		quality: 10
+		quality: quality
 	});
 	btn.onclick = gifs
 	function gifs() {
@@ -14,15 +22,17 @@ window.onload = ()=> {
 		var timer = setInterval(()=> {
 			video = document.getElementById("video");	//获取页面中的video元素
 			canvas = document.createElement("canvas"); // 创建一个画布
-			// canvas.width = video.videoWidth * 0.3;
-			// canvas.height = video.videoHeight * 0.3;
-			canvas.width = 500;
-			canvas.height =  350;
+			if (resolut[0] && resolut[1]) {
+				canvas.width = resolut[0]
+				canvas.height = resolut[1]
+			} else {
+				canvas.width = video.videoWidth;
+				canvas.height = video.videoHeight;
+			}
 			canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); // getContext:设置画布环境；drawImage:画画
 			var imgurl = canvas.toDataURL("image/png");
-			gif.addFrame(canvas, { copy: true, delay: 200 })
+			gif.addFrame(canvas, { copy: true, delay: speed })
 			imglist.push(imgurl);
-			console.log(imglist)
 			video.play()
 			if (imglist.length > 20) {
 				// 添加显示
@@ -36,19 +46,21 @@ window.onload = ()=> {
 				clearInterval(timer);
 				setTimeout(function () {
 					gif.on('finished', function (blob) {
+						console.log(imglist)
 						console.log(blob);
-						// donw(blob)
+						bytesToSize(blob.size)
+						donw(blob)
 						video.pause()
 						let gifImg = document.createElement('img')
 						gifImg.src = URL.createObjectURL(blob)
 						document.querySelector('.bottom_left').appendChild(gifImg)
 						loading(flag_loading = false)
-						// window.open(URL.createObjectURL(blob));
+						window.open(URL.createObjectURL(blob));
 					});
 					gif.render();
 				}, 200)
 			}
-		}, 200)
+		}, smooth)
 	}
 }
 
@@ -90,10 +102,26 @@ function selectVideo() {
 	let _video = document.createElement("video")
 	_video.src = url;
 	_video.classList.add('video')
-	_video.setAttribute('controls', true)
 	_video.setAttribute('id', 'video')
+	_video.muted = true;
+	_video.controls = true;
+	// 视频加载完毕时
+	_video.addEventListener('loadedmetadata', (e) => {
+		console.log(parseInt(_video.duration));
+		let _range = document.querySelector('#range')
+		_range.max = _video.duration
+	})
 	document.querySelector('.video_box').appendChild(_video)
 	isShowElsemnt(flag = true)
+}
+
+// 进度条处理
+function ranges() {
+	let inner = document.querySelector('.range_inner')
+	let _range = document.querySelector('#range')
+	let _video = document.querySelector('.video')
+	inner.innerHTML = _range.value + 's'
+	_video.currentTime = _range.value
 }
 
 // 控制面板元素显示或者隐藏
@@ -111,3 +139,84 @@ function isShowElsemnt(flag) {
 		_top_rightP.style.display = 'block'
 	}
 }
+
+
+// 分辨率大小
+function selectOpt() {
+	let select = document.getElementById('selectopt');
+	let index=  select.selectedIndex; 
+	let val = select.options[index].value;
+	let str = val.split('x')
+	console.log(val);
+	if (val == '保持原尺寸') {
+		resolut[0] = null
+		resolut[1] = null
+	}
+	resolut[0] = str[0]
+	resolut[1] = str[1]
+}
+
+// 动画速度
+function selectspeed(){
+	let selectspeed = document.getElementById('selectspeed');
+	let index=  selectspeed.selectedIndex; 
+	let val = selectspeed.options[index].value;
+	console.log(val);
+	if (val == '正常') {
+		speed = 150
+	} else if (val == '慢') {
+		speed = 400
+	}
+	else if (val == '中') {
+		speed = 300
+	}else if (val == '快') {
+		speed = 80
+	}
+	else if (val == '较快') {
+		speed = 10
+	}
+}
+
+// 画质
+function selectmass() {
+	let selectmass = document.getElementById('selectmass');
+	let index=  selectmass.selectedIndex; 
+	let val = selectmass.options[index].value;
+	console.log(val);
+	if(val == '高') {
+		quality = 30
+	}else if ('中'){
+		quality = 20
+	}else {
+		quality = 1
+	}
+}
+
+// 流畅度
+function selectsmooth() {
+	let selectsmooth = document.getElementById('selectsmooth');
+	let index=  selectsmooth.selectedIndex; 
+	let val = selectsmooth.options[index].value;
+	console.log(val);
+	if(val == '正常') {
+		smooth = 200
+	} else {
+		quality = 50
+	}
+}
+
+// 字节转换
+function bytesToSize(bytes) {
+	if (bytes === 0) {
+	 return '0 B';
+	 }
+
+	 let k = 1024;
+
+	 let sizes = ['B','KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+	 let i = Math.floor(Math.log(bytes) / Math.log(k));
+	 let num = (bytes / Math.pow(k, i)).toFixed(1) > Math.floor((bytes / Math.pow(k, i))) ?
+		 (bytes / Math.pow(k, i)).toFixed(1) : Math.floor((bytes / Math.pow(k, i)));
+		 console.log(num + ' ' + sizes[i]);
+	 return num + ' ' + sizes[i];
+ }
