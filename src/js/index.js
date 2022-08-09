@@ -2,6 +2,9 @@ var flag = false;
 var flag_loading = false;
 var video;
 var canvas;
+var gifImgSrc;
+var blobs;
+var fileNames;
 // 分辨率
 var resolut = [null, null]
 // 动画速度
@@ -48,14 +51,15 @@ window.onload = ()=> {
 					gif.on('finished', function (blob) {
 						console.log(imglist)
 						console.log(blob);
-						bytesToSize(blob.size)
-						donw(blob)
+						blobs = blob
 						video.pause()
 						let gifImg = document.createElement('img')
 						gifImg.src = URL.createObjectURL(blob)
+						gifImgSrc = URL.createObjectURL(blob)
 						document.querySelector('.bottom_left').appendChild(gifImg)
 						loading(flag_loading = false)
-						window.open(URL.createObjectURL(blob));
+						fileNames = +new Date() + '.gif'
+						_dowonLoad(bytesToSize(blob.size), fileNames, blob)
 					});
 					gif.render();
 				}, 200)
@@ -75,10 +79,10 @@ function loading(flag_loading){
 }
 
 // 下载gif
-function donw(blob) {
+function donw(blob, fileNames) {
 	const link = document.createElement('a')
 	// 规定下载的超链接
-	link.download = +new Date() + 'gif'
+	link.download = fileNames
 	// 未点击前隐藏a链接
 	link.style.display = 'none'
 	// 创建URL对象，指向该文件url
@@ -91,6 +95,11 @@ function donw(blob) {
 	URL.revokeObjectURL(link.href)
 	// 从dom中移除该a链接
 	document.body.removeChild(link)
+}
+
+// 查看gif
+function lookPic (blob) {
+	window.open(URL.createObjectURL(blob));
 }
 
 // 选取本地视频并创建播放器
@@ -220,3 +229,40 @@ function bytesToSize(bytes) {
 		 console.log(num + ' ' + sizes[i]);
 	 return num + ' ' + sizes[i];
  }
+
+//  添加下载链接
+function _dowonLoad(size, fileName = 'text') {
+	let _box = document.querySelector('.wrap_post')
+	let innerTxt = `
+		<div class="box-file">
+			<p>输出文件</p>
+			<div>
+				<span>${fileName}</span>
+			</div>
+		</div>
+		<div class="box-file">
+			<p>文件大小</p>
+			<div>
+				<span>${size}</span>
+			</div>
+		</div>
+		<div class="box-file">
+			<p>操作</p>
+			<div>
+				<span onclick="lookP()" style="cursor: pointer;" id="lookPics">预览</span>
+				<span onclick="downP()" style="cursor: pointer;" id="donws">下载</span>
+			</div>
+		</div>
+	`
+	_box.innerHTML = innerTxt
+	isBlobs = true
+}
+function lookP() {
+	console.log(1111111);
+	lookPic(blobs)
+}
+function downP() {
+	console.log(222);
+	donw(blobs, fileNames)
+
+}
