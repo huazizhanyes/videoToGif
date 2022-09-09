@@ -201,6 +201,3 @@ function bytesToSize(bytes) {
     return num + ' ' + sizes[i];
  }
 ```
-
-##### 完整项目地址
-* [see github](https://github.com/huazizhanyes/videoToGif) 
