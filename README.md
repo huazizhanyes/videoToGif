@@ -201,3 +201,6 @@ function bytesToSize(bytes) {
     return num + ' ' + sizes[i];
  }
 ```
+
+##### 查看文档地址
+* [see github](http://blog.hzzy.xyz/pages/0778e2/) 
