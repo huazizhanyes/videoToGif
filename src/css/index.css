@@ -226,7 +226,9 @@ a{
 .start_btn {
     margin-top: 20px;
     width: 85%;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .start_btn button {
     background: #0093E9;

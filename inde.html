@@ -28,9 +28,9 @@
 							<span class="range_inner">0s</span>
 						</div>
 						<div class="con-1">
-							<label for="range">持续时间：</label>
-							<input type="range" name="range" max="" min="0" value="0" id="range" onchange="ranges()">
-							<span class="range_inner">0s</span>
+							<label for="timer">持续帧：</label>
+							<input type="range" name="timer" max="50" min="10" value="10" id="timer" onchange="timer()">
+							<span class="timer_inner">10帧</span>
 						</div>
 						<div class="con-2">
 							<span>分辨率大小：</span>
@@ -78,6 +78,7 @@
 					</div>
 					<div class="start_btn">
 						<button id="btn">开始转换</button>
+						<button id="reload">重新选取</button>
 					</div>
 				</div>
 			</div>

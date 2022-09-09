@@ -13,12 +13,17 @@ var speed = 150
 var quality = 20
 // 流畅度
 var smooth = 200
+// 动画持续帧
+var video_timer = 10
+
+
 window.onload = ()=> {
 	var imglist = [];
 	var gif = new GIF({
 		workers: 2,
 		quality: quality
 	});
+	isShowzhORreload(1)
 	btn.onclick = gifs
 	function gifs() {
 		loading(flag_loading = true)
@@ -37,7 +42,7 @@ window.onload = ()=> {
 			gif.addFrame(canvas, { copy: true, delay: speed })
 			imglist.push(imgurl);
 			video.play()
-			if (imglist.length > 20) {
+			if (imglist.length > video_timer) {
 				// 添加显示
 				for (let _x = 0; _x < imglist.length; _x++) {
 					let _img = document.createElement("img")
@@ -62,10 +67,15 @@ window.onload = ()=> {
 						_dowonLoad(bytesToSize(blob.size), fileNames, blob)
 					});
 					gif.render();
+					isShowzhORreload(2)
 				}, 200)
 			}
 		}, smooth)
 	}
+	// 重新选取视频
+	document.querySelector('#reload').addEventListener('click', ()=> {
+		window.location.reload()
+	})
 }
 
 // loding加载动画
@@ -131,6 +141,14 @@ function ranges() {
 	let _video = document.querySelector('.video')
 	inner.innerHTML = _range.value + 's'
 	_video.currentTime = _range.value
+}
+
+// 动画持续帧
+function timer() {
+	let inner = document.querySelector('.timer_inner')
+	let _timer = document.querySelector('#timer')
+	inner.innerHTML = _timer.value + '帧'
+	video_timer = _timer.value
 }
 
 // 控制面板元素显示或者隐藏
@@ -258,11 +276,25 @@ function _dowonLoad(size, fileName = 'text') {
 	isBlobs = true
 }
 function lookP() {
-	console.log(1111111);
 	lookPic(blobs)
 }
 function downP() {
-	console.log(222);
 	donw(blobs, fileNames)
 
+}
+
+/**
+ * 控制显示转换还是重新选取视频
+ * @param {*} isFinis  1:开始转换； 2：重新选取
+ */
+function isShowzhORreload(isFinis) {
+	let zh = document.getElementById('btn')
+	let reload = document.getElementById('reload')
+	if (isFinis === 1) {
+		zh.style.display = 'block'
+		reload.style.display = "none"
+	} else {
+		zh.style.display = 'none'
+		reload.style.display = "block"
+	}
 }
